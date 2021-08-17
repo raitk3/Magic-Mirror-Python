@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os
 import datetime
 import time
@@ -172,11 +169,6 @@ def create_weather_frames():
     wind_speed_frame.grid(row=0, column=14, sticky="NEWS")
     weather_frames.append(wind_speed_frame)
 
-    wind_icon_frame = tk.Label(
-        root, text="💨", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-        font=(FONT, TEMP_SIZE), anchor="e")
-    wind_icon_frame.grid(row=0, column=13, sticky="NEWS")
-
     return weather_frames
 
 
@@ -189,8 +181,6 @@ def update_weather(frames):
             if weather_data[i] != "N/A":
                 CURRENT_WEATHER_ICON = tk.PhotoImage(data=weather_data[i])
                 frames[i].configure(image=CURRENT_WEATHER_ICON)
-        elif i == 0:
-            frames[i].configure(text=f"🌡{weather_data[i]}")
         elif i == 3:
             frames[i].configure(text=convert_angle_to_dir(weather_data[i]))
         else:
