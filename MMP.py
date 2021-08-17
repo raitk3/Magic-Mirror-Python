@@ -144,12 +144,12 @@ def create_weather_frames():
 
     temp_frame = tk.Label(root, text=f"Temperature", font=(
         FONT, TEMP_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
-    temp_frame.grid(row=1, column=14, columnspan=2, sticky="NEWS")
+    temp_frame.grid(row=1, column=13, columnspan=3, sticky="NEWS")
     weather_frames.append(temp_frame)
 
     feels_frame = tk.Label(root, text=f"Temperature", font=(
         FONT, FEELS_LIKE_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
-    feels_frame.grid(row=2, column=15, sticky="NEWS")
+    feels_frame.grid(row=2, column=14, columnspan=2, sticky="NEWS")
     weather_frames.append(feels_frame)
 
     icon_frame = tk.Label(
@@ -160,13 +160,13 @@ def create_weather_frames():
     wind_direction_frame = tk.Label(
         root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
         font=(FONT, TEMP_SIZE), anchor="e")
-    wind_direction_frame.grid(row=0, column=15, sticky="NEWS")
+    wind_direction_frame.grid(row=0, column=14, columnspan=2, sticky="NEWS")
     weather_frames.append(wind_direction_frame)
 
     wind_speed_frame = tk.Label(
         root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
         font=(FONT, TEMP_SIZE), anchor="w")
-    wind_speed_frame.grid(row=0, column=13, sticky="NEWS")
+    wind_speed_frame.grid(row=0, column=12, columnspan=2, sticky="NEWS")
     weather_frames.append(wind_speed_frame)
 
     return weather_frames
