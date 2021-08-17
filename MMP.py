@@ -1,4 +1,5 @@
 import os
+import datetime
 import time
 import tkinter as tk
 import requests
@@ -23,31 +24,44 @@ TROLLEY_COLOUR = "blue"
 
 
 def get_time():
-    return time.strftime("%H:%M:%S")
+    current_time = time.time()
+    time_as_string = time.strftime("%H:%M:%S")
+
+    # Some hack to get todays time in seconds
+    now = datetime.datetime.now()
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    seconds = (now - midnight).seconds
+    return time.strftime("%H:%M:%S"), time.time(), seconds
 
 
 def convert_K_to_C(temperature_in_kelvin):
     return temperature_in_kelvin - 273.15
 
 
+def get_time_remaining_string(scheduled_time, current_time):
+    time_remaining = (scheduled_time - current_time) // 60
+    if time_remaining < 1:
+        return "Vähem kui 1 minuti pärast"
+    return f"{time_remaining} minuti pärast"
+
+
 def get_buses():
     list_of_buses = []
     response = requests.get(
-        f"https://transport.tallinn.ee/siri-stop-departures.php?stopid=881&time="
+        f"https://transport.tallinn.ee/siri-stop-departures.php?stopid=881&time=0"
     )
-    print(response)
     rows = response.text.split("\n")[2:-1]
     for i, row in enumerate(rows):
         if i < 3:
             data = row.split(",")
-            time = int(data[5]) // 60
-            string = "Vähem kui 1 minuti pärast"
-            if time > 0:
-                string = f"{time} minuti pärast"
-            list_of_buses.append([data[1], data[4], string, data[0]])
+            bus_trol = data[0]
+            line_number = data[1]
+            eta = int(data[2])
+            terminus = data[4]
+            list_of_buses.append([line_number, terminus, eta, bus_trol])
         else:
             break
-    return list_of_buses[::-1]
+    return list_of_buses
 
 
 def get_weather():
@@ -122,21 +136,32 @@ def update_weather(frames):
         frames[i].configure(text=weather_data[i])
 
 
-def update_buses(number_frames, terminus_frames, time_frames):
-    #buses = get_buses()
-    buses = get_mock_buses()
+def update_buses(buses, number_frames, terminus_frames, time_frames, force_update):
+    _, _, current_time = get_time()
+    updated = False
+
+    if force_update or len(buses) < 3 or buses[0][2] < current_time:
+        try:
+            buses = get_buses()
+            updated = True
+        except Exception:
+            print("Failed to update!")
+    #buses = get_mock_buses()
     for i in range(3):
+        row = 2-i
         if len(buses) > i:
-            number_frames[i].configure(text=buses[i][0], fg=BUS_COLOUR)
+            number_frames[row].configure(text=buses[-i][0], fg=BUS_COLOUR)
             if buses[i][3] == "trol":
-                number_frames[i].configure(fg=TROLLEY_COLOUR)
-            terminus_frames[i].configure(text=buses[i][1])
-            time_frames[i].configure(text=buses[i][2])
+                number_frames[row].configure(fg=TROLLEY_COLOUR)
+            terminus_frames[row].configure(text=buses[i][1])
+            time_frames[row].configure(
+                text=get_time_remaining_string(buses[i][2], current_time))
 
         else:
-            number_frames[i].configure(text="")
-            terminus_frames[i].configure(text="")
-            time_frames[i].configure(text="")
+            number_frames[row].configure(text="")
+            terminus_frames[row].configure(text="")
+            time_frames[row].configure(text="")
+    return buses, updated
 
 
 def create_clock_and_date_frames():
@@ -161,6 +186,7 @@ if __name__ == '__main__':
             root.rowconfigure(i, weight=1, uniform="row")
 
     current_time = ""
+    current_bus_schedule = []
     last_updated = 0
 
     clock_frame, date_frame = create_clock_and_date_frames()
@@ -168,16 +194,19 @@ if __name__ == '__main__':
     weather_frames = create_weather_frames()
 
     while True:
-        if current_time != (new_time := get_time()):
-            current_time = new_time
+        time_as_string, time_as_time, _ = get_time()
+        if current_time != time_as_string:
+            current_time = time_as_string
             date = time.strftime("%A, %d. %B %Y")
             clock_frame.configure(text=current_time)
             date_frame.configure(text=date)
-        if (current_time := time.time()) - last_updated > 10:
-            last_updated = current_time
-            print("update!")
-            update_buses(number_frames, terminus_frames, time_frames)
-            update_weather(weather_frames)
+            force_update = time_as_time - last_updated > 300
+            current_bus_schedule, updated = update_buses(
+                current_bus_schedule, number_frames, terminus_frames, time_frames, force_update)
+            if updated:
+                last_updated = time_as_time
+                # Might as well update weather as well...
+                update_weather(weather_frames)
         root.attributes("-fullscreen", True)
         root.configure(background='black')
         root.update()
