@@ -10,6 +10,10 @@ from tkinter import *
 CLOCK_FONT_SIZE = 72
 DATE_FONT_SIZE = 25
 
+DEFAULT_FONT_COLOUR = "white"
+DEFAULT_BACKGROUND_COLOUR = "black"
+DEFAULT_ACCENT_COLOUR = "gray"
+
 # TRANSPORT
 BUS_NUMBER_SIZE = 30
 BUS_LITTLE_FONT_SIZE = 15
@@ -22,6 +26,10 @@ FEELS_LIKE_SIZE = 15
 BUS_COLOUR = "lime"
 TROLLEY_COLOUR = "blue"
 
+def do_grid():
+    for i in range(16):
+        for j in range(10):
+            tk.Label(root, relief="raised").grid(row=j, column=i, sticky="NEWS")
 
 def get_time():
     current_time = time.time()
@@ -97,17 +105,17 @@ def create_bus_frames():
 
     for i in range(3):
         number_frame = tk.Label(root, text=f"Bus{i}", font=(
-            'caviar dreams', BUS_NUMBER_SIZE), bg='black', fg='white')
+            'caviar dreams', BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
         number_frame.grid(row=8 - 2*i, column=0, rowspan=2, sticky="NEWS")
         number_frames.append(number_frame)
 
         terminus_frame = tk.Label(root, text=f"Terminus{i}", font=(
-            'caviar dreams', BUS_LITTLE_FONT_SIZE), bg='black', fg='white', anchor="sw")
+            'caviar dreams', BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
         terminus_frame.grid(row=8 - 2*i, column=1, columnspan=8, sticky="NEWS")
         terminus_frames.append(terminus_frame)
 
         time_frame = tk.Label(root, text=f"Time{i}", font=(
-            'caviar dreams', BUS_LITTLE_FONT_SIZE), bg='black', fg='gray', anchor="nw")
+            'caviar dreams', BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="nw")
         time_frame.grid(row=9 - 2*i, column=1, columnspan=8, sticky="NEWS")
         time_frames.append(time_frame)
 
@@ -118,13 +126,13 @@ def create_weather_frames():
     weather_frames = []
 
     temp_frame = tk.Label(root, text=f"Temperature", font=(
-        'caviar dreams', TEMP_SIZE), bg='black', fg='white')
-    temp_frame.grid(row=0, column=14, rowspan=2, columnspan=3, sticky="NS")
+        'caviar dreams', TEMP_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
+    temp_frame.grid(row=0, column=14, rowspan=2, columnspan=3, sticky="NEWS")
     weather_frames.append(temp_frame)
 
     feels_frame = tk.Label(root, text=f"Temperature", font=(
-        'caviar dreams', FEELS_LIKE_SIZE), bg='black', fg='gray')
-    feels_frame.grid(row=2, column=15, rowspan=1, columnspan=2, sticky="NE")
+        'caviar dreams', FEELS_LIKE_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
+    feels_frame.grid(row=2, column=15, rowspan=1, columnspan=2, sticky="NEWS")
     weather_frames.append(feels_frame)
 
     return weather_frames
@@ -166,10 +174,10 @@ def update_buses(buses, number_frames, terminus_frames, time_frames, force_updat
 
 def create_clock_and_date_frames():
     clock_frame = tk.Label(root, font=(
-        'caviar dreams', CLOCK_FONT_SIZE), bg='black', fg='white', anchor="nw")
+        'caviar dreams', CLOCK_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
     clock_frame.grid(row=0, column=0, rowspan=2, columnspan=10, sticky="NEWS")
     date_frame = tk.Label(root, font=(
-        'caviar dreams', DATE_FONT_SIZE), bg='black', fg='white', anchor="nw")
+        'caviar dreams', DATE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
     date_frame.grid(row=2, column=0, rowspan=1, columnspan=10, sticky="NEWS")
     return clock_frame, date_frame
 
@@ -186,9 +194,9 @@ if __name__ == '__main__':
             root.rowconfigure(i, weight=1, uniform="row")
 
     current_time = ""
+    do_grid()
     current_bus_schedule = []
     last_updated = 0
-
     clock_frame, date_frame = create_clock_and_date_frames()
     number_frames, terminus_frames, time_frames = create_bus_frames()
     weather_frames = create_weather_frames()
@@ -208,5 +216,5 @@ if __name__ == '__main__':
                 # Might as well update weather as well...
                 update_weather(weather_frames)
         root.attributes("-fullscreen", True)
-        root.configure(background='black')
+        root.configure(background=DEFAULT_BACKGROUND_COLOUR)
         root.update()
