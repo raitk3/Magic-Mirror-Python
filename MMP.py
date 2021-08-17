@@ -47,13 +47,13 @@ def convert_angle_to_dir(angle):
 
 def get_time():
     current_time = time.time()
-    time_as_string = time.strftime("%H:%M:%S")
+    time_as_string = time.strftime("%H:%M")
 
     # Some hack to get todays time in seconds
     now = datetime.datetime.now()
     midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     seconds = (now - midnight).seconds
-    return time.strftime("%H:%M:%S"), time.time(), seconds
+    return time_as_string, current_time, seconds
 
 
 def convert_K_to_C(temperature_in_kelvin):
