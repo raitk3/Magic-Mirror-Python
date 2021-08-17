@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import datetime
 import time
@@ -7,7 +10,7 @@ import requests
 import locale
 from tkinter import *
 
-#FONT
+# FONT
 FONT = 'caviar dreams'
 # CLOCK
 CLOCK_FONT_SIZE = 72
@@ -31,6 +34,7 @@ TROLLEY_COLOUR = "blue"
 
 CURRENT_WEATHER_ICON = ""
 
+
 def do_grid():
     for i in range(16):
         for j in range(10):
@@ -42,6 +46,7 @@ def convert_angle_to_dir(angle):
     sectors = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
     angle_of_attack = (angle + 22.5) % 360
     return sectors[int(angle_of_attack // 45)]
+
 
 def get_time():
     current_time = time.time()
@@ -87,20 +92,22 @@ def get_buses():
 def get_weather():
     city_name = "Tallinn, EE"
     API_key = "a32682b68c181bcc25cfae1aba449380"
-    response = requests.get(
-        f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={API_key}"
-    ).json()
-    temperature = str(round(convert_K_to_C(
-        response["main"]["temp"]), 1))+"°C"
-    feels_like = str(round(convert_K_to_C(
-        response["main"]["feels_like"]), 1))+"°C"
-    weather_icon = response["weather"][0]["icon"]
-    weather_icon = base64.encodebytes(requests.get(f"http://openweathermap.org/img/wn/{weather_icon}.png", stream=True).raw.read())
-    wind_direction = response["wind"]["deg"]
-    wind_speed = response["wind"]["speed"]
-    return temperature, feels_like, weather_icon, wind_direction, wind_speed
-    #except Exception:
-    #    return "N/A", "N/A", "N/A", "N/A", "N/A"
+    try:
+        response = requests.get(
+            f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={API_key}"
+        ).json()
+        temperature = str(round(convert_K_to_C(
+            response["main"]["temp"]), 1))+"°C"
+        feels_like = str(round(convert_K_to_C(
+            response["main"]["feels_like"]), 1))+"°C"
+        weather_icon = response["weather"][0]["icon"]
+        weather_icon = base64.encodebytes(requests.get(
+            f"http://openweathermap.org/img/wn/{weather_icon}.png", stream=True).raw.read())
+        wind_direction = response["wind"]["deg"]
+        wind_speed = response["wind"]["speed"]
+        return temperature, feels_like, weather_icon, wind_direction, wind_speed
+    except Exception:
+        return "N/A", "N/A", "N/A", "N/A", "N/A"
 
 
 def get_mock_buses():
@@ -117,15 +124,18 @@ def create_bus_frames():
     time_frames = []
 
     for i in range(3):
-        number_frame = tk.Label(root, text=f"Bus{i}", font=(FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
+        number_frame = tk.Label(root, text=f"Bus{i}", font=(
+            FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
         number_frame.grid(row=8 - 2*i, column=0, rowspan=2, sticky="NEWS")
         number_frames.append(number_frame)
 
-        terminus_frame = tk.Label(root, text=f"Terminus{i}", font=(FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
+        terminus_frame = tk.Label(root, text=f"Terminus{i}", font=(
+            FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
         terminus_frame.grid(row=8 - 2*i, column=1, columnspan=8, sticky="NEWS")
         terminus_frames.append(terminus_frame)
 
-        time_frame = tk.Label(root, text=f"Time{i}", font=(FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="nw")
+        time_frame = tk.Label(root, text=f"Time{i}", font=(
+            FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="nw")
         time_frame.grid(row=9 - 2*i, column=1, columnspan=8, sticky="NEWS")
         time_frames.append(time_frame)
 
@@ -135,33 +145,35 @@ def create_bus_frames():
 def create_weather_frames():
     weather_frames = []
 
-    temp_frame = tk.Label(root, text=f"Temperature", font=(FONT, TEMP_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
+    temp_frame = tk.Label(root, text=f"Temperature", font=(
+        FONT, TEMP_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
     temp_frame.grid(row=1, column=14, columnspan=2, sticky="NEWS")
     weather_frames.append(temp_frame)
 
-    feels_frame = tk.Label(root, text=f"Temperature", font=(FONT, FEELS_LIKE_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
+    feels_frame = tk.Label(root, text=f"Temperature", font=(
+        FONT, FEELS_LIKE_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
     feels_frame.grid(row=2, column=15, sticky="NEWS")
     weather_frames.append(feels_frame)
-    
+
     icon_frame = tk.Label(
-        root, text="Icon", bg = DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="e")
+        root, text="Icon", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="e")
     icon_frame.grid(row=1, column=13, sticky="NEWS")
     weather_frames.append(icon_frame)
 
     wind_direction_frame = tk.Label(
-        root, text="Wind", bg = DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, 
+        root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
         font=(FONT, TEMP_SIZE), anchor="e")
     wind_direction_frame.grid(row=0, column=15, sticky="NEWS")
     weather_frames.append(wind_direction_frame)
 
     wind_speed_frame = tk.Label(
-        root, text="Wind", bg = DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, 
+        root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
         font=(FONT, TEMP_SIZE), anchor="w")
     wind_speed_frame.grid(row=0, column=14, sticky="NEWS")
     weather_frames.append(wind_speed_frame)
 
     wind_icon_frame = tk.Label(
-        root, text="💨", bg = DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, 
+        root, text="💨", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
         font=(FONT, TEMP_SIZE), anchor="e")
     wind_icon_frame.grid(row=0, column=13, sticky="NEWS")
 
@@ -214,9 +226,11 @@ def update_buses(buses, number_frames, terminus_frames, time_frames, force_updat
 
 
 def create_clock_and_date_frames():
-    clock_frame = tk.Label(root, font=(FONT, CLOCK_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
+    clock_frame = tk.Label(root, font=(FONT, CLOCK_FONT_SIZE),
+                           bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
     clock_frame.grid(row=0, column=0, rowspan=2, columnspan=10, sticky="NEWS")
-    date_frame = tk.Label(root, font=(FONT, DATE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
+    date_frame = tk.Label(root, font=(FONT, DATE_FONT_SIZE),
+                          bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
     date_frame.grid(row=2, column=0, rowspan=1, columnspan=10, sticky="NEWS")
     return clock_frame, date_frame
 
@@ -228,7 +242,7 @@ if __name__ == '__main__':
     #locale.setlocale(locale.LC_TIME, "et_ET")
 
     current_time = ""
-    #do_grid()
+    # do_grid()
     current_bus_schedule = []
     last_updated = 0
     clock_frame, date_frame = create_clock_and_date_frames()
