@@ -154,7 +154,7 @@ def create_weather_frames():
 
     icon_frame = tk.Label(
         root, text="Icon", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="e")
-    icon_frame.grid(row=1, column=13, sticky="NEWS")
+    icon_frame.grid(row=1, column=12, sticky="NEWS")
     weather_frames.append(icon_frame)
 
     wind_direction_frame = tk.Label(
@@ -166,7 +166,7 @@ def create_weather_frames():
     wind_speed_frame = tk.Label(
         root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
         font=(FONT, TEMP_SIZE), anchor="w")
-    wind_speed_frame.grid(row=0, column=14, sticky="NEWS")
+    wind_speed_frame.grid(row=0, column=13, sticky="NEWS")
     weather_frames.append(wind_speed_frame)
 
     return weather_frames
