@@ -201,7 +201,7 @@ def update_buses(buses, number_frames, terminus_frames, time_frames, force_updat
     for i in range(3):
         row = 2-i
         if len(buses) > i:
-            number_frames[row].configure(text=buses[-i][0], fg=BUS_COLOUR)
+            number_frames[row].configure(text=buses[i][0], fg=BUS_COLOUR)
             if buses[i][3] == "trol":
                 number_frames[row].configure(fg=TROLLEY_COLOUR)
             terminus_frames[row].configure(text=buses[i][1])
