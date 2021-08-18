@@ -12,17 +12,17 @@ LOCALE = "et_EE.utf8"
 
 # FONT
 FONT = 'Poppins'
-BOLD_FONT = 'Poppins'
+BOLD_FONT = 'Poppins Semibold'
 # CLOCK
 CLOCK_FONT_SIZE = 72
-DATE_FONT_SIZE = 25
+DATE_FONT_SIZE = 22
 
 DEFAULT_FONT_COLOUR = "white"
 DEFAULT_BACKGROUND_COLOUR = "black"
 DEFAULT_ACCENT_COLOUR = "gray"
 
 # TRANSPORT
-BUS_NUMBER_SIZE = 30
+BUS_NUMBER_SIZE = 40
 BUS_LITTLE_FONT_SIZE = 15
 
 # WEATHER
@@ -79,28 +79,27 @@ class BusController:
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
                     BOLD_FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
                 number_frame.grid(
-                    row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], rowspan=2, sticky="NEWS")
+                    row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan = 2, rowspan=2, sticky="NEWS")
                 self.number_frames.append(number_frame)
 
                 terminus_frame = tk.Label(self.root, text=f"Terminus{i}", font=(
                     FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
                 terminus_frame.grid(row=self.coords[0] + self.rowspan - 1 - 2*i,
-                                    column=self.coords[1]+1, columnspan=self.colspan - 1, sticky="NEWS")
+                                    column=self.coords[1]+2, columnspan=self.colspan - 2, sticky="NEWS")
                 self.terminus_frames.append(terminus_frame)
 
                 time_frame = tk.Label(self.root, text=f"Time{i}", font=(
                     FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="nw")
                 time_frame.grid(row=self.coords[0] + self.rowspan - 2*i,
-                                column=self.coords[1]+1, columnspan=self.colspan - 1, sticky="NEWS")
+                                column=self.coords[1]+2, columnspan=self.colspan - 2, sticky="NEWS")
                 self.time_frames.append(time_frame)
 
     def update(self, timeController, force_update=False):
         updated = False
-        if force_update or len(self.schedule) < 3 or self.last_updated == None or self.schedule[0][2] < timeController.current_time or timeController - self.last_updated > 300:
-            self.last_updated = timeController.current_time
+        if force_update or len(self.schedule) < 3 or self.last_updated == None or self.schedule[0][2] < timeController.current_time or timeController.current_time - self.last_updated > 300:
             try:
                 self.update_schedule()
-                updated = True
+                self.last_updated = timeController.current_time
             except Exception:
                 print("Failed to update!")
         if self.root != None:
@@ -114,7 +113,8 @@ class BusController:
                     self.terminus_frames[row].configure(
                         text=self.schedule[i][1])
                     self.time_frames[row].configure(
-                        text=f"{self.get_time_remaining_string(self.schedule[i][2], timeController.time_in_seconds)} ({timeController.seconds_to_time(self.schedule[i][2])})"
+                        #text=f"{self.get_time_remaining_string(self.schedule[i][2], timeController.time_in_seconds)} ({timeController.seconds_to_time(self.schedule[i][2])})"
+                        text=f"{self.get_time_remaining_string(self.schedule[i][2], timeController.time_in_seconds)}"
                     )
 
                 else:
@@ -149,7 +149,7 @@ class WeatherController:
                     f"http://openweathermap.org/img/wn/{weather_icon}.png", stream=True).raw.read())
                 wind_direction = response["wind"]["deg"]
                 wind_speed = response["wind"]["speed"]
-                last_updated = timeController.current_time
+                self.last_updated = timeController.current_time
                 self.data = [temperature,
                              feels_like,
                              tk.PhotoImage(data=weather_icon),
@@ -188,16 +188,16 @@ class WeatherController:
 
             wind_direction_frame = tk.Label(
                 self.root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-                font=(FONT, WIND_SIZE), anchor="e")
+                font=(FONT, WIND_SIZE), anchor="s")
             wind_direction_frame.grid(
-                row=self.coords[0], column=self.coords[1]+2, columnspan=2, sticky="NEWS")
+                row=self.coords[0], column=self.coords[1]+3, columnspan=1, sticky="NEWS")
             self.widgets.append(wind_direction_frame)
 
             wind_speed_frame = tk.Label(
                 self.root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-                font=(FONT, WIND_SIZE), anchor="e")
+                font=(FONT, WIND_SIZE), anchor="se")
             wind_speed_frame.grid(
-                row=self.coords[0], column=self.coords[1]+1, columnspan=2, sticky="NEWS")
+                row=self.coords[0], column=self.coords[1], columnspan=3, sticky="NEWS")
             self.widgets.append(wind_speed_frame)
 
     def update(self, timeController):
@@ -248,7 +248,7 @@ class TimeController:
     def create_clock_widget(self):
         if self.root != None:
             self.widget = tk.Label(self.root, font=(BOLD_FONT, CLOCK_FONT_SIZE),
-                                   bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
+                                   bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="w")
             self.widget.grid(row=self.coords[0], column=self.coords[1],
                              rowspan=self.rowspan, columnspan=self.colspan, sticky="NEWS")
 
@@ -290,14 +290,14 @@ class Program:
             if i < 10:
                 self.root.rowconfigure(i, weight=1, uniform="row")
 
-        # self.do_grid()
+        #self.do_grid()
 
         self.timeController = TimeController(
-            coords=(0, 0), root=self.root, rowspan=2, colspan=10)
+            coords=(0, 0), root=self.root, rowspan=2, colspan=5)
         self.dateController = DateController(
-            coords=(1, 0), root=self.root, rowspan=1, colspan=10)
+            coords=(1, 0), root=self.root, rowspan=1, colspan=9)
         self.busController = BusController(
-            coords=(5, 0), root=self.root, rowspan=6, colspan=8)
+            coords=(3, 0), root=self.root, rowspan=6, colspan=9)
         self.weatherController = WeatherController(
             coords=(0, 12), root=self.root)
 
