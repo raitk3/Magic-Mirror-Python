@@ -24,6 +24,7 @@ BUS_LITTLE_FONT_SIZE = 15
 # WEATHER
 TEMP_SIZE = 30
 FEELS_LIKE_SIZE = 15
+WIND_SIZE = 18
 
 # COLOURS
 BUS_COLOUR = "#56C1A6"
@@ -38,6 +39,10 @@ def do_grid():
             tk.Label(root, relief="raised").grid(
                 row=j, column=i, sticky="NEWS")
 
+def seconds_to_time(seconds):
+    hours = seconds // 3600
+    minutes = int((seconds / 60) % 60)
+    return f"{hours}:{minutes}"
 
 def convert_angle_to_dir(angle):
     sectors = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
@@ -159,14 +164,14 @@ def create_weather_frames():
 
     wind_direction_frame = tk.Label(
         root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-        font=(FONT, TEMP_SIZE), anchor="e")
+        font=(FONT, WIND_SIZE), anchor="e")
     wind_direction_frame.grid(row=0, column=14, columnspan=2, sticky="NEWS")
     weather_frames.append(wind_direction_frame)
 
     wind_speed_frame = tk.Label(
         root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-        font=(FONT, TEMP_SIZE), anchor="w")
-    wind_speed_frame.grid(row=0, column=12, columnspan=2, sticky="NEWS")
+        font=(FONT, WIND_SIZE), anchor="e")
+    wind_speed_frame.grid(row=0, column=13, columnspan=2, sticky="NEWS")
     weather_frames.append(wind_speed_frame)
 
     return weather_frames
@@ -182,6 +187,8 @@ def update_weather(frames):
                 frames[i].configure(image=CURRENT_WEATHER_ICON)
         elif i == 3:
             frames[i].configure(text=convert_angle_to_dir(weather_data[i]))
+        elif i == 4:
+            frames[i].configure(text=f"{round(weather_data[i], 1)}m/s")
         else:
             frames[i].configure(text=weather_data[i])
 
@@ -197,7 +204,6 @@ def update_buses(buses, number_frames, terminus_frames, time_frames, force_updat
         except Exception:
             print("Failed to update!")
     #buses = get_mock_buses()
-    print(buses[0][2], current_time)
     for i in range(3):
         row = 2-i
         if len(buses) > i:
@@ -206,7 +212,8 @@ def update_buses(buses, number_frames, terminus_frames, time_frames, force_updat
                 number_frames[row].configure(fg=TROLLEY_COLOUR)
             terminus_frames[row].configure(text=buses[i][1])
             time_frames[row].configure(
-                text=get_time_remaining_string(buses[i][2], current_time))
+                text=f"{get_time_remaining_string(buses[i][2], current_time)} ({seconds_to_time(buses[i][2])})"
+)
 
         else:
             number_frames[row].configure(text="")
@@ -229,7 +236,7 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title('Mirror')
 
-    #locale.setlocale(locale.LC_TIME, "et_ET")
+    locale.setlocale(locale.LC_TIME, "et_EE.utf8")
 
     current_time = ""
     # do_grid()
