@@ -12,7 +12,7 @@ LOCALE = "et_EE.utf8"
 
 # FONT
 FONT = 'Poppins'
-BOLD_FONT = 'Poppins Bold'
+BOLD_FONT = 'Poppins'
 # CLOCK
 CLOCK_FONT_SIZE = 72
 DATE_FONT_SIZE = 25
