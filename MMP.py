@@ -243,7 +243,7 @@ class TimeController:
     def seconds_to_time(self, seconds):
         hours = seconds // 3600
         minutes = int((seconds / 60) % 60)
-        return f"{hours}:{minutes:>2}"
+        return f"{hours}:{minutes:0>2}"
 
     def create_clock_widget(self):
         if self.root != None:
