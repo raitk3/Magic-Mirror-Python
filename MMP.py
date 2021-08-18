@@ -96,7 +96,7 @@ class BusController:
 
     def update(self, timeController, force_update=False):
         updated = False
-        if force_update or len(self.schedule) < 3 or self.last_updated == None or self.schedule[0][2] < timeController.current_time or timeController.current_time - self.last_updated > 300:
+        if force_update or len(self.schedule) < 3 or self.last_updated == None or self.schedule[0][2] < timeController.time_in_seconds or timeController.current_time - self.last_updated > 300:
             try:
                 self.update_schedule()
                 self.last_updated = timeController.current_time
