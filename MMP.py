@@ -174,7 +174,6 @@ def create_weather_frames():
 
 def update_weather(frames):
     weather_data = get_weather()
-    print(weather_data)
     global CURRENT_WEATHER_ICON
     for i in range(min(len(frames), len(weather_data))):
         if i == 2:
@@ -198,6 +197,7 @@ def update_buses(buses, number_frames, terminus_frames, time_frames, force_updat
         except Exception:
             print("Failed to update!")
     #buses = get_mock_buses()
+    print(buses[0][2], current_time)
     for i in range(3):
         row = 2-i
         if len(buses) > i:
@@ -246,13 +246,13 @@ if __name__ == '__main__':
             date = time.strftime("%A, %d. %B %Y")
             clock_frame.configure(text=current_time)
             date_frame.configure(text=date)
-            force_update = time_as_time - last_updated > 300
-            current_bus_schedule, updated = update_buses(
-                current_bus_schedule, number_frames, terminus_frames, time_frames, force_update)
-            if updated:
-                last_updated = time_as_time
-                # Might as well update weather as well...
-                update_weather(weather_frames)
+        force_update = time_as_time - last_updated > 300
+        current_bus_schedule, updated = update_buses(
+            current_bus_schedule, number_frames, terminus_frames, time_frames, force_update)
+        if updated:
+            last_updated = time_as_time
+            # Might as well update weather as well...
+            update_weather(weather_frames)
         root.attributes("-fullscreen", True)
         root.configure(background=DEFAULT_BACKGROUND_COLOUR)
         for i in range(16):
