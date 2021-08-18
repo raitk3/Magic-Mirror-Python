@@ -293,7 +293,7 @@ class Program:
         #self.do_grid()
 
         self.timeController = TimeController(
-            coords=(0, 0), root=self.root, rowspan=2, colspan=5)
+            coords=(0, 0), root=self.root, rowspan=2, colspan=6)
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
         self.busController = BusController(
