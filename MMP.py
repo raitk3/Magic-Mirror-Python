@@ -25,7 +25,7 @@ DEFAULT_BACKGROUND_COLOUR = "black"
 DEFAULT_ACCENT_COLOUR = "gray"
 
 # TRANSPORT
-BUS_NUMBER_SIZE = 40
+BUS_NUMBER_SIZE = 30
 BUS_LITTLE_FONT_SIZE = 15
 
 # WEATHER
@@ -115,7 +115,7 @@ class BusController:
                     line_time - timeController.time_in_seconds) % (24*60*60)
                 trip = trips[el[0]]
                 line_number = routes[trips[el[0]][0]][0]
-                line_terminus = routes[trips[el[0]][0]][1]
+                line_terminus = routes[trips[el[0]][0]][1].split("-")[-1].strip()
                 actual_schedule.append(
                     [line_number, line_terminus, line_time, "white"])
             actual_schedule.sort(key=lambda x: (
