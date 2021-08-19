@@ -115,7 +115,8 @@ class BusController:
                     line_time - timeController.time_in_seconds) % (24*60*60)
                 trip = trips[el[0]]
                 line_number = routes[trips[el[0]][0]][0]
-                line_terminus = routes[trips[el[0]][0]][1].split("-")[-1].strip()
+                line_terminus = routes[trips[el[0]]
+                                       [0]][1].split("-")[-1].strip()
                 actual_schedule.append(
                     [line_number, line_terminus, line_time, "white"])
             actual_schedule.sort(key=lambda x: (
@@ -133,8 +134,8 @@ class BusController:
         if time_remaining % 60 == 0:
             return f"{time_remaining // 3600} tunni pärast."
         if time_remaining > 59:
-            return f"{time_remaining // 3600} tunni ja {time_remaining % 60} minuti pärast"
-        return f"{time_remaining} minuti pärast"
+            return f"{time_remaining // 3600} tunni ja {(time_remaining // 60) % 60} minuti pärast"
+        return f"{time_remaining // 60} minuti pärast"
 
     def create_bus_frames(self):
         if self.root != None:
