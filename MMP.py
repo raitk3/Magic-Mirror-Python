@@ -5,6 +5,9 @@ import base64
 import tkinter as tk
 import requests
 import locale
+
+import urllib
+
 from tkinter import *
 
 # LOCALE
@@ -49,28 +52,88 @@ class BusController:
 
         self.create_bus_frames()
 
-    def update_schedule(self):
-        list_of_buses = []
-        response = requests.get(
-            f"https://transport.tallinn.ee/siri-stop-departures.php?stopid=881&time=0"
-        )
-        rows = response.text.split("\n")[2:-1]
-        for i, row in enumerate(rows):
-            if i < 3:
-                data = row.split(",")
-                bus_trol = data[0]
-                line_number = data[1]
-                eta = int(data[2])
-                terminus = data[4]
-                list_of_buses.append([line_number, terminus, eta, bus_trol])
-            else:
-                break
-        self.schedule = list_of_buses
+    def update_schedule(self, timeController, force_update):
+        if \
+                force_update \
+                or len(self.schedule) < 3 \
+                or self.schedule[0][2] < timeController.time_in_seconds \
+                or self.last_updated == None \
+                or timeController.current_time - self.last_updated > 300:
+            list_of_buses = []
+            response = requests.get(
+                f"https://transport.tallinn.ee/siri-stop-departures.php?stopid=881&time=0"
+            )
+            rows = response.text.split("\n")[2:-1]
+            for i, row in enumerate(rows):
+                if i < 3:
+                    data = row.split(",")
+                    bus_trol = data[0]
+                    line_number = data[1]
+                    eta = int(data[2])
+                    terminus = data[4]
+                    list_of_buses.append(
+                        [line_number, terminus, eta, bus_trol])
+                else:
+                    break
+            self.schedule = list_of_buses
+
+    def update_schedule_risti(self, timeController, force_update):
+        if \
+                force_update \
+                or len(self.schedule) == 0 \
+                or self.schedule[0][2] < timeController.time_in_seconds \
+                or self.last_updated == None \
+                or timeController.current_time - self.last_updated > 60:
+            # 25470,5700337-1
+            # 25469,5700338-1
+            schedule = []
+            trips = {}
+            routes = {}
+            list_of_buses = []
+            with open("stop_times.txt") as f:
+                for line in f.readlines():
+                    line_data = line.split(",")
+                    if line_data[3] in ["25469", "25470"]:
+                        schedule.append([line_data[0], line_data[2]])
+            schedule.sort(key=lambda el: el[1])
+            with open("trips.txt") as f:
+                for trip in f.readlines():
+                    trip_data = trip.split(",")
+                    if trip_data[2] in [el[0] for el in schedule]:
+                        trips[trip_data[2]] = [trip_data[0], trip_data[3]]
+            with open("routes.txt") as f:
+                for route in f.readlines():
+                    route_data = route.split(",")
+                    if route_data[0] in [trips[el][0] for el in trips]:
+                        routes[route_data[0]] = route_data[2:4]
+            # with ZipFile("data.zip", "r") as zf:
+            #    zf.printdir()
+            actual_schedule = []
+            for el in schedule:
+                line_time = timeController.time_to_seconds(el[1])
+                time_left = (
+                    line_time - timeController.time_in_seconds) % (24*60*60)
+                trip = trips[el[0]]
+                line_number = routes[trips[el[0]][0]][0]
+                line_terminus = routes[trips[el[0]][0]][1]
+                actual_schedule.append(
+                    [line_number, line_terminus, line_time, "white"])
+            actual_schedule.sort(key=lambda x: (
+                line_time - timeController.time_in_seconds) % (24*60*60))
+            print(*actual_schedule, sep="\n")
+            list_of_buses = actual_schedule[0:3]
+            print()
+            print(list_of_buses)
+            self.schedule = list_of_buses
 
     def get_time_remaining_string(self, scheduled_time, current_time):
-        time_remaining = (scheduled_time - current_time) // 60
+        time_remaining = (scheduled_time - current_time) % (24 * 60 * 60)
         if time_remaining < 1:
             return "Vähem kui 1 minuti pärast"
+        if time_remaining % 60 == 0:
+            return f"{time_remaining // 3600} tunni pärast."
+        if time_remaining > 59:
+            return f"{time_remaining // 3600} tunni ja {time_remaining % 60} minuti pärast"
         return f"{time_remaining} minuti pärast"
 
     def create_bus_frames(self):
@@ -79,7 +142,7 @@ class BusController:
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
                     BOLD_FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
                 number_frame.grid(
-                    row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan = 2, rowspan=2, sticky="NEWS")
+                    row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan=2, rowspan=2, sticky="NEWS")
                 self.number_frames.append(number_frame)
 
                 terminus_frame = tk.Label(self.root, text=f"Terminus{i}", font=(
@@ -96,12 +159,12 @@ class BusController:
 
     def update(self, timeController, force_update=False):
         updated = False
-        if force_update or len(self.schedule) < 3 or self.last_updated == None or self.schedule[0][2] < timeController.time_in_seconds or timeController.current_time - self.last_updated > 300:
-            try:
-                self.update_schedule()
-                self.last_updated = timeController.current_time
-            except Exception:
-                print("Failed to update!")
+        # try:
+        # self.update_schedule()
+        self.update_schedule_risti(timeController, force_update)
+        self.last_updated = timeController.current_time
+        # except Exception:
+        #    print("Failed to update!")
         if self.root != None:
             for i in range(3):
                 row = 2-i
@@ -110,6 +173,10 @@ class BusController:
                         text=self.schedule[i][0], fg=BUS_COLOUR)
                     if self.schedule[i][3] == "trol":
                         self.number_frames[row].configure(fg=TROLLEY_COLOUR)
+                    elif self.schedule[i][3] == "white":
+                        self.number_frames[row].configure(
+                            fg=DEFAULT_FONT_COLOUR)
+
                     self.terminus_frames[row].configure(
                         text=self.schedule[i][1])
                     self.time_frames[row].configure(
@@ -245,6 +312,10 @@ class TimeController:
         minutes = int((seconds / 60) % 60)
         return f"{hours}:{minutes:0>2}"
 
+    def time_to_seconds(self, time_given):
+        elements = [int(el) for el in time_given.split(":")]
+        return elements[0] * 3600 + elements[1] * 60 + elements[2]
+
     def create_clock_widget(self):
         if self.root != None:
             self.widget = tk.Label(self.root, font=(BOLD_FONT, CLOCK_FONT_SIZE),
@@ -290,7 +361,7 @@ class Program:
             if i < 10:
                 self.root.rowconfigure(i, weight=1, uniform="row")
 
-        #self.do_grid()
+        # self.do_grid()
 
         self.timeController = TimeController(
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
