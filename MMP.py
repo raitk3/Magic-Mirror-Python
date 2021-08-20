@@ -128,14 +128,16 @@ class BusController:
             self.schedule = list_of_buses
 
     def get_time_remaining_string(self, scheduled_time, current_time):
-        time_remaining = (scheduled_time - current_time) % (24 * 60 * 60)
-        if time_remaining < 1:
+        time_remaining = ((scheduled_time - current_time) % (24 * 60 * 60))
+        hours = time_remaining // 3600
+        minutes = (time_remaining // 60) % 60
+        if minutes < 1:
             return "Vähem kui 1 minuti pärast"
-        if time_remaining % 60 == 0:
-            return f"{time_remaining // 3600} tunni pärast."
-        if time_remaining > 59:
-            return f"{time_remaining // 3600} tunni ja {(time_remaining // 60) % 60} minuti pärast"
-        return f"{time_remaining // 60} minuti pärast"
+        if minutes == 0:
+            return f"{hours} tunni pärast."
+        if hours > 0:
+            return f"{hours} tunni ja {minutes} minuti pärast"
+        return f"{minutes} minuti pärast"
 
     def create_bus_frames(self):
         if self.root != None:
@@ -160,12 +162,12 @@ class BusController:
 
     def update(self, timeController, force_update=False):
         updated = False
-        # try:
-        # self.update_schedule()
-        self.update_schedule_risti(timeController, force_update)
-        self.last_updated = timeController.current_time
-        # except Exception:
-        #    print("Failed to update!")
+        try:
+            self.update_schedule(timeController, force_update)
+            #self.update_schedule_risti(timeController, force_update)
+            self.last_updated = timeController.current_time
+        except Exception:
+            print("Failed to update!")
         if self.root != None:
             for i in range(3):
                 row = 2-i
