@@ -286,7 +286,6 @@ class WeatherController:
                 else:
                     self.widgets[i].configure(text=self.data[i])
 
-
 class TimeController:
     def __init__(self, coords, root=None, rowspan=1, colspan=1):
         self.coords = coords
@@ -364,7 +363,7 @@ class Program:
             if i < 10:
                 self.root.rowconfigure(i, weight=1, uniform="row")
 
-        # self.do_grid()
+        self.do_grid()
 
         self.timeController = TimeController(
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
@@ -388,6 +387,7 @@ class Program:
             self.busController.update(self.timeController, False)
             self.weatherController.update(self.timeController)
             self.root.update()
+            print(self.root.winfo_width(), self.root.winfo_height())
 
 
 if __name__ == '__main__':
