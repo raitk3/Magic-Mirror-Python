@@ -39,7 +39,7 @@ TROLLEY_COLOUR = "#3466B1"
 
 
 class BusController:
-    def __init__(self, coords, root=None, rowspan=1, colspan=1):
+    def __init__(self, coords, stop_id, stop_name, root=None, rowspan=1, colspan=1):
         self.schedule = []
         self.root = root
         self.last_updated = None
@@ -49,6 +49,8 @@ class BusController:
         self.number_frames = []
         self.terminus_frames = []
         self.time_frames = []
+        self.stop_id = stop_id
+        self.stop_name = stop_name
 
         self.create_bus_frames()
 
@@ -61,7 +63,7 @@ class BusController:
                 or timeController.current_time - self.last_updated > 300:
             list_of_buses = []
             response = requests.get(
-                f"https://transport.tallinn.ee/siri-stop-departures.php?stopid=881&time=0"
+                f"https://transport.tallinn.ee/siri-stop-departures.php?stopid={self.stop_id}&time=0"
             )
             rows = response.text.split("\n")[2:-1]
             for i, row in enumerate(rows):
@@ -141,6 +143,12 @@ class BusController:
 
     def create_bus_frames(self):
         if self.root != None:
+            name_frame = tk.Label(self.root,
+            text=self.stop_name,
+            font=(BOLD_FONT, WIND_SIZE),
+            bg=DEFAULT_BACKGROUND_COLOUR,
+            fg=DEFAULT_FONT_COLOUR)
+            name_frame.grid(row=self.coords[0], column=self.coords[1], columnspan=self.colspan, sticky="NESW")
             for i in range(3):
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
                     BOLD_FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
@@ -150,7 +158,7 @@ class BusController:
 
                 terminus_frame = tk.Label(self.root, text=f"Terminus{i}", font=(
                     FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
-                terminus_frame.grid(row=self.coords[0] + self.rowspan - 1 - 2*i,
+                terminus_frame.grid(row=self.coords[0] - 1 + self.rowspan - 2*i,
                                     column=self.coords[1]+2, columnspan=self.colspan - 2, sticky="NEWS")
                 self.terminus_frames.append(terminus_frame)
 
@@ -286,6 +294,7 @@ class WeatherController:
                 else:
                     self.widgets[i].configure(text=self.data[i])
 
+
 class TimeController:
     def __init__(self, coords, root=None, rowspan=1, colspan=1):
         self.coords = coords
@@ -363,14 +372,16 @@ class Program:
             if i < 10:
                 self.root.rowconfigure(i, weight=1, uniform="row")
 
-        self.do_grid()
+        # self.do_grid()
 
         self.timeController = TimeController(
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
-        self.busController = BusController(
-            coords=(3, 0), root=self.root, rowspan=6, colspan=9)
+        self.busController_1 = BusController(
+            coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
+        self.busController_2 = BusController(
+            coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
         self.weatherController = WeatherController(
             coords=(0, 12), root=self.root)
 
@@ -384,10 +395,10 @@ class Program:
         while True:
             self.timeController.update()
             self.dateController.update()
-            self.busController.update(self.timeController, False)
+            self.busController_1.update(self.timeController, False)
+            self.busController_2.update(self.timeController, False)
             self.weatherController.update(self.timeController)
             self.root.update()
-            print(self.root.winfo_width(), self.root.winfo_height())
 
 
 if __name__ == '__main__':
