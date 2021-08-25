@@ -171,8 +171,10 @@ class BusController:
     def update(self, timeController, force_update=False):
         updated = False
         try:
-            self.update_schedule(timeController, force_update)
-            #self.update_schedule_risti(timeController, force_update)
+            if self.stop_name == "Risti" and self.stop_id == "N/A":
+                self.update_schedule_risti(timeController, force_update)
+            else:
+                self.update_schedule(timeController, force_update)
             self.last_updated = timeController.current_time
         except Exception:
             print("Failed to update!")
@@ -379,9 +381,11 @@ class Program:
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
         self.busController_1 = BusController(
-            coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
-        self.busController_2 = BusController(
-            coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
+            coords=(3, 0), stop_id="N/A", stop_name="Risti", root=self.root, rowspan=6, colspan=8)
+        #self.busController_1 = BusController(
+        #    coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
+        #self.busController_2 = BusController(
+        #    coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
         self.weatherController = WeatherController(
             coords=(0, 12), root=self.root)
 
@@ -396,7 +400,7 @@ class Program:
             self.timeController.update()
             self.dateController.update()
             self.busController_1.update(self.timeController, False)
-            self.busController_2.update(self.timeController, False)
+            #self.busController_2.update(self.timeController, False)
             self.weatherController.update(self.timeController)
             self.root.update()
 
