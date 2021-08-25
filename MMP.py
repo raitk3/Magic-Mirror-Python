@@ -248,33 +248,33 @@ class WeatherController:
 
     def create_widgets(self):
         if self.root != None:
-            temp_frame = tk.Label(self.root, text=f"Temperature", font=(
+            temp_frame = tk.Label(self.root, text=f"", font=(
                 FONT, TEMP_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
             temp_frame.grid(
                 row=self.coords[0]+1, column=self.coords[1]+1, columnspan=3, sticky="NEWS")
             self.widgets.append(temp_frame)
 
-            feels_frame = tk.Label(self.root, text=f"Temperature", font=(
+            feels_frame = tk.Label(self.root, text=f"", font=(
                 FONT, FEELS_LIKE_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
             feels_frame.grid(
                 row=self.coords[0]+2, column=self.coords[1]+2, columnspan=2, sticky="NEWS")
             self.widgets.append(feels_frame)
 
             icon_frame = tk.Label(
-                self.root, text="Icon", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="e")
+                self.root, text="", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="e")
             icon_frame.grid(row=self.coords[0]+1,
                             column=self.coords[1], sticky="NEWS")
             self.widgets.append(icon_frame)
 
             wind_direction_frame = tk.Label(
-                self.root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
+                self.root, text="", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
                 font=(FONT, WIND_SIZE), anchor="s")
             wind_direction_frame.grid(
                 row=self.coords[0], column=self.coords[1]+3, columnspan=1, sticky="NEWS")
             self.widgets.append(wind_direction_frame)
 
             wind_speed_frame = tk.Label(
-                self.root, text="Wind", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
+                self.root, text="", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
                 font=(FONT, WIND_SIZE), anchor="se")
             wind_speed_frame.grid(
                 row=self.coords[0], column=self.coords[1], columnspan=3, sticky="NEWS")
