@@ -79,7 +79,7 @@ class BusController:
                     break
             self.schedule = list_of_buses
 
-    def update_schedule_risti(self, timeController, force_update):
+    def update_schedule_risti(self, timeController, force_update, stop_id):
         if \
                 force_update \
                 or len(self.schedule) == 0 \
@@ -92,10 +92,11 @@ class BusController:
             trips = {}
             routes = {}
             list_of_buses = []
+            time_atm = timeController.time_in_seconds
             with open("stop_times.txt") as f:
                 for line in f.readlines():
                     line_data = line.split(",")
-                    if line_data[3] in ["25469", "25470"]:
+                    if line_data[3] == stop_id:
                         schedule.append([line_data[0], line_data[2]])
             schedule.sort(key=lambda el: el[1])
             with open("trips.txt") as f:
@@ -117,17 +118,17 @@ class BusController:
                     line_time - timeController.time_in_seconds) % (24*60*60)
                 trip = trips[el[0]]
                 line_number = routes[trips[el[0]][0]][0]
-                line_terminus = routes[trips[el[0]]
-                                       [0]][1].split("-")[-1].strip()
+                line_terminus = trips[el[0]][1]
                 actual_schedule.append(
                     [line_number, line_terminus, line_time, "white"])
             actual_schedule.sort(key=lambda x: (
-                line_time - timeController.time_in_seconds) % (24*60*60))
-            print(*actual_schedule, sep="\n")
+                x[2] - timeController.time_in_seconds) % (24*60*60))
+            #print(*actual_schedule, sep="\n")
             list_of_buses = actual_schedule[0:3]
-            print()
-            print(list_of_buses)
-            self.schedule = list_of_buses
+            cut_list_of_buses = [el for el in list_of_buses if (el[2] - time_atm) % (24*60*60) < (2 * 60 * 60)]
+            #print()
+            print(*list_of_buses, sep="\n")
+            self.schedule = cut_list_of_buses
 
     def get_time_remaining_string(self, scheduled_time, current_time):
         time_remaining = ((scheduled_time - current_time) % (24 * 60 * 60))
@@ -147,7 +148,8 @@ class BusController:
             text=self.stop_name,
             font=(BOLD_FONT, WIND_SIZE),
             bg=DEFAULT_BACKGROUND_COLOUR,
-            fg=DEFAULT_FONT_COLOUR)
+            fg=DEFAULT_FONT_COLOUR,
+            anchor="w")
             name_frame.grid(row=self.coords[0], column=self.coords[1], columnspan=self.colspan, sticky="NESW")
             for i in range(3):
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
@@ -171,8 +173,8 @@ class BusController:
     def update(self, timeController, force_update=False):
         updated = False
         try:
-            if self.stop_name == "Risti" and self.stop_id == "N/A":
-                self.update_schedule_risti(timeController, force_update)
+            if self.stop_name[0:5] == "Risti" and self.stop_id in ["25469", "25470"]:
+                self.update_schedule_risti(timeController, force_update, self.stop_id)
             else:
                 self.update_schedule(timeController, force_update)
             self.last_updated = timeController.current_time
@@ -381,7 +383,10 @@ class Program:
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
         self.busController_1 = BusController(
-            coords=(3, 0), stop_id="N/A", stop_name="Risti", root=self.root, rowspan=6, colspan=8)
+            coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
+        self.busController_2 = BusController(
+            coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
+        
         #self.busController_1 = BusController(
         #    coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
         #self.busController_2 = BusController(
@@ -400,7 +405,7 @@ class Program:
             self.timeController.update()
             self.dateController.update()
             self.busController_1.update(self.timeController, False)
-            #self.busController_2.update(self.timeController, False)
+            self.busController_2.update(self.timeController, False)
             self.weatherController.update(self.timeController)
             self.root.update()
 
