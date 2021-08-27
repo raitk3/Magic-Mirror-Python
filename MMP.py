@@ -108,7 +108,7 @@ class BusController:
                 for route in f.readlines():
                     route_data = route.split(",")
                     if route_data[0] in [trips[el][0] for el in trips]:
-                        routes[route_data[0]] = route_data[2:4]
+                        routes[route_data[0]] = route_data[2:4] + [route_data[6]]
             # with ZipFile("data.zip", "r") as zf:
             #    zf.printdir()
             actual_schedule = []
@@ -119,10 +119,11 @@ class BusController:
                 trip = trips[el[0]]
                 line_number = routes[trips[el[0]][0]][0]
                 line_terminus = trips[el[0]][1]
-                actual_schedule.append(
-                    [line_number, line_terminus, line_time, "white"])
+                dataset = [line_number, line_terminus, line_time, "white"]
+                if dataset not in actual_schedule:
+                    actual_schedule.append(dataset)
             actual_schedule.sort(key=lambda x: (
-                x[2] - timeController.time_in_seconds) % (24*60*60))
+                x[2] - timeController.time_in_seconds) % (24 * 60 * 60))
             print(*actual_schedule, sep="\n")
             list_of_buses = actual_schedule[0:3]
             cut_list_of_buses = [el for el in list_of_buses if (
@@ -389,7 +390,8 @@ class Program:
             coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
         self.busController_2 = BusController(
             coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
-
+        exit_button = tk.Button(self.root, command=self.root.destroy, bg=DEFAULT_BACKGROUND_COLOUR, relief="flat")
+        exit_button.grid(row=0, column=6, sticky="NEWS")
         # self.busController_1 = BusController(
         #    coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
         # self.busController_2 = BusController(
