@@ -387,16 +387,16 @@ class Program:
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
-        self.busController_1 = BusController(
-            coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
-        self.busController_2 = BusController(
-            coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
+        #self.busController_1 = BusController(
+        #    coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
+        #self.busController_2 = BusController(
+        #    coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
         exit_button = tk.Button(self.root, command=self.root.destroy, bg=DEFAULT_BACKGROUND_COLOUR, relief="flat")
         exit_button.grid(row=0, column=6, sticky="NEWS")
-        # self.busController_1 = BusController(
-        #    coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
-        # self.busController_2 = BusController(
-        #    coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
+        self.busController_1 = BusController(
+           coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
+        self.busController_2 = BusController(
+           coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
         self.weatherController = WeatherController(
             coords=(0, 12), root=self.root)
 
