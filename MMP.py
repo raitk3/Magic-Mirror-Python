@@ -137,10 +137,10 @@ class BusController:
         time_remaining = ((scheduled_time - current_time) % (24 * 60 * 60))
         hours = time_remaining // 3600
         minutes = (time_remaining // 60) % 60
+        if minutes == 0 and hours > 0:
+            return f"{hours} tunni pärast."
         if minutes < 1:
             return "Vähem kui 1 minuti pärast"
-        if minutes == 0:
-            return f"{hours} tunni pärast."
         if hours > 0:
             return f"{hours} tunni ja {minutes} minuti pärast"
         return f"{minutes} minuti pärast"
@@ -190,12 +190,12 @@ class BusController:
                 row = 2-i
                 if len(self.schedule) > i:
                     self.number_frames[row].configure(
-                        text=self.schedule[i][0], bg=BUS_COLOUR)
+                        text=self.schedule[i][0], bg=BUS_COLOUR, fg=DEFAULT_FONT_COLOUR)
                     if self.schedule[i][3] == "trol":
-                        self.number_frames[row].configure(bg=TROLLEY_COLOUR)
+                        self.number_frames[row].configure(bg=TROLLEY_COLOUR, fg= DEFAULT_FONT_COLOUR)
                     elif self.schedule[i][3] == "white":
                         self.number_frames[row].configure(
-                            bg=DEFAULT_FONT_COLOUR)
+                            bg=DEFAULT_FONT_COLOUR, fg = DEFAULT_BACKGROUND_COLOUR)
 
                     self.terminus_frames[row].configure(
                         text=self.schedule[i][1])
