@@ -159,7 +159,7 @@ class BusController:
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
                     BOLD_FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
                 number_frame.grid(
-                    row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan=2, rowspan=2, padx=10, pady=10, sticky="NEWS")
+                    row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan=2, rowspan=2, padx=20, pady=20, sticky="NEWS")
                 self.number_frames.append(number_frame)
 
                 terminus_frame = tk.Label(self.root, text=f"Terminus{i}", font=(
