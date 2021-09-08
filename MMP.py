@@ -121,14 +121,14 @@ class BusController:
                 line_number = routes[trips[el[0]][0]][0]
                 line_terminus = trips[el[0]][1]
                 dataset = [line_number, line_terminus, line_time, "white"]
-                if dataset not in actual_schedule:
+                if dataset not in actual_schedule and line_terminus != "Risti":
                     actual_schedule.append(dataset)
             actual_schedule.sort(key=lambda x: (
                 x[2] - timeController.time_in_seconds) % (24 * 60 * 60))
             print(*actual_schedule, sep="\n")
             list_of_buses = actual_schedule[0:3]
             cut_list_of_buses = [el for el in list_of_buses if (
-                el[2] - time_atm) % (24*60*60) < (2 * 60 * 60)]
+                el[2] - time_atm) % (24*60*60) <= (3 * 60 * 60)]
             print()
             print(*list_of_buses, sep="\n")
             self.schedule = cut_list_of_buses
@@ -387,16 +387,16 @@ class Program:
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
-        #self.busController_1 = BusController(
-        #    coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
-        #self.busController_2 = BusController(
-        #    coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
+        self.busController_1 = BusController(
+            coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
+        self.busController_2 = BusController(
+            coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
         exit_button = tk.Button(self.root, command=self.root.destroy, bg=DEFAULT_BACKGROUND_COLOUR, relief="flat")
         exit_button.grid(row=0, column=6, sticky="NEWS")
-        self.busController_1 = BusController(
-           coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
-        self.busController_2 = BusController(
-           coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
+        #self.busController_1 = BusController(
+        #   coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
+        #self.busController_2 = BusController(
+        #   coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
         self.weatherController = WeatherController(
             coords=(0, 12), root=self.root)
 
