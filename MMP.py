@@ -120,7 +120,7 @@ class BusController:
                 trip = trips[el[0]]
                 line_number = routes[trips[el[0]][0]][0]
                 line_terminus = trips[el[0]][1]
-                dataset = [line_number, line_terminus, line_time, "white"]
+                dataset = [line_number, line_terminus, line_time, "trol" if (not line_number.isdigit() or int(line_number) < 100) else "bus"]
                 if dataset not in actual_schedule and line_terminus != "Risti":
                     actual_schedule.append(dataset)
             actual_schedule.sort(key=lambda x: (
@@ -183,7 +183,8 @@ class BusController:
             else:
                 self.update_schedule(timeController, force_update)
             self.last_updated = timeController.current_time
-        except Exception:
+        except Exception as e:
+            print(e)
             print("Failed to update!")
         if self.root != None:
             for i in range(3):
