@@ -38,23 +38,34 @@ WIND_SIZE = 18 * SCALE
 BUS_COLOUR = "#56C1A6"
 TROLLEY_COLOUR = "#3466B1"
 
+list_of_stops = [
+    ("881", "Keemia", False),
+    ("888", "Tehnikaülikool", False),
+    ("25469", "Risti (-> Haapsalu)", False),
+    ("25470", "Risti (-> Tallinn)", False)
+]
 
 class BusController:
-    def __init__(self, coords, stop_id, stop_name, root=None, rowspan=1, colspan=1):
+    def __init__(self, coords, stop_list, root=None, rowspan=1, colspan=1):
+        global list_of_stops
         self.schedule = []
         self.root = root
         self.last_updated = None
         self.coords = coords
         self.rowspan = rowspan
         self.colspan = colspan
+        self.title_frame = None
         self.number_frames = []
         self.terminus_frames = []
         self.time_frames = []
-        self.stop_id = stop_id
-        self.stop_name = stop_name
+        self.previous_index = stop_list
+        self.index = stop_list
+        self.stop_id = list_of_stops[stop_list][0]
+        self.stop_name = list_of_stops[stop_list][1]
+        list_of_stops[stop_list] = (self.stop_id, self.stop_name, True)
 
         self.create_bus_frames()
-
+        
     def update_schedule(self, timeController, force_update):
         if \
                 force_update \
@@ -87,8 +98,6 @@ class BusController:
                 or self.schedule[0][2] < timeController.time_in_seconds \
                 or self.last_updated == None \
                 or timeController.current_time - self.last_updated > 60:
-            # 25470,5700337-1
-            # 25469,5700338-1
             schedule = []
             trips = {}
             routes = {}
@@ -147,13 +156,14 @@ class BusController:
 
     def create_bus_frames(self):
         if self.root != None:
-            name_frame = tk.Label(self.root,
+            self.title_frame = tk.Button(self.root,
                                   text=self.stop_name,
                                   font=(BOLD_FONT, WIND_SIZE),
                                   bg=DEFAULT_BACKGROUND_COLOUR,
                                   fg=DEFAULT_FONT_COLOUR,
-                                  anchor="w")
-            name_frame.grid(
+                                  anchor="w",
+                                  command=self.cycle_stops)
+            self.title_frame.grid(
                 row=self.coords[0], column=self.coords[1], columnspan=self.colspan, sticky="NESW")
             for i in range(3):
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
@@ -174,8 +184,25 @@ class BusController:
                                 column=self.coords[1]+2, columnspan=self.colspan - 2, sticky="NEWS")
                 self.time_frames.append(time_frame)
 
+    def cycle_stops(self):
+        global list_of_stops
+        print("CYCLE!")
+        for i in range(self.index, self.index + len(list_of_stops)):
+            i1 = i % len(list_of_stops)
+            if list_of_stops[i1][2] == False:
+                list_of_stops[self.index] = (list_of_stops[self.index][0], list_of_stops[self.index][1], False)
+                self.index = i1
+                self.stop_id = list_of_stops[self.index][0]
+                self.stop_name = list_of_stops[self.index][1]
+                list_of_stops[self.index] = (list_of_stops[self.index][0], list_of_stops[self.index][1], True)
+                break
+        print(list_of_stops)
+
     def update(self, timeController, force_update=False):
         updated = False
+        if self.index != self.previous_index:
+            force_update = True
+        self.previous_index = self.index
         try:
             if self.stop_name[0:5] == "Risti" and self.stop_id in ["25469", "25470"]:
                 self.update_schedule_risti(
@@ -187,6 +214,7 @@ class BusController:
             print(e)
             print("Failed to update!")
         if self.root != None:
+            self.title_frame.configure(text=self.stop_name)
             for i in range(3):
                 row = 2-i
                 if len(self.schedule) > i:
@@ -388,18 +416,12 @@ class Program:
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
         self.dateController = DateController(
             coords=(1, 0), root=self.root, rowspan=1, colspan=9)
-        """
-        self.busController_1 = BusController(
-            coords=(3, 0), stop_id="25469", stop_name="Risti (-> Haapsalu)", root=self.root, rowspan=6, colspan=8)
-        self.busController_2 = BusController(
-            coords=(3, 8), stop_id="25470", stop_name="Risti (-> Tallinn)", root=self.root, rowspan=6, colspan=8)
-        """
         exit_button = tk.Button(self.root, command=self.root.destroy, bg=DEFAULT_BACKGROUND_COLOUR, relief="flat")
         exit_button.grid(row=0, column=6, sticky="NEWS")
         self.busController_1 = BusController(
-           coords=(3, 0), stop_id="881", stop_name="Keemia", root=self.root, rowspan=6, colspan=8)
+           coords=(3, 0), stop_list = 0, root=self.root, rowspan=6, colspan=8)
         self.busController_2 = BusController(
-           coords=(3, 8), stop_id="888", stop_name="Tehnikaülikool", root=self.root, rowspan=6, colspan=8)
+           coords=(3, 8), stop_list = 1, root=self.root, rowspan=6, colspan=8)
         self.weatherController = WeatherController(
             coords=(0, 12), root=self.root)
 
