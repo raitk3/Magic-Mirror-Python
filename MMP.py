@@ -234,7 +234,7 @@ class BusController:
                     )
 
                 else:
-                    self.number_frames[row].configure(text="")
+                    self.number_frames[row].configure(text="", bg=DEFAULT_BACKGROUND_COLOUR)
                     self.terminus_frames[row].configure(text="")
                     self.time_frames[row].configure(text="")
 
