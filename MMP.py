@@ -18,21 +18,21 @@ FONT = 'Poppins'
 BOLD_FONT = 'Poppins Semibold'
 # CLOCK
 SCALE = 1
-CLOCK_FONT_SIZE = 72 * SCALE
-DATE_FONT_SIZE = 20 * SCALE
+CLOCK_FONT_SIZE = 72
+DATE_FONT_SIZE = 20
 
 DEFAULT_FONT_COLOUR = "white"
 DEFAULT_BACKGROUND_COLOUR = "black"
 DEFAULT_ACCENT_COLOUR = "gray"
 
 # TRANSPORT
-BUS_NUMBER_SIZE = 30 * SCALE
-BUS_LITTLE_FONT_SIZE = 14 * SCALE
+BUS_NUMBER_SIZE = 30
+BUS_LITTLE_FONT_SIZE = 14
 
 # WEATHER
-TEMP_SIZE = 30 * SCALE
-FEELS_LIKE_SIZE = 15 * SCALE
-WIND_SIZE = 18 * SCALE
+TEMP_SIZE = 30
+FEELS_LIKE_SIZE = 15
+WIND_SIZE = 18
 
 # COLOURS
 BUS_COLOUR = "#56C1A6"
@@ -158,7 +158,7 @@ class BusController:
         if self.root != None:
             self.title_frame = tk.Button(self.root,
                                   text=self.stop_name,
-                                  font=(BOLD_FONT, WIND_SIZE),
+                                  font=(BOLD_FONT, int(WIND_SIZE*SCALE)),
                                   bg=DEFAULT_BACKGROUND_COLOUR,
                                   fg=DEFAULT_FONT_COLOUR,
                                   anchor="w",
@@ -167,19 +167,19 @@ class BusController:
                 row=self.coords[0], column=self.coords[1], columnspan=self.colspan, sticky="NESW")
             for i in range(3):
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
-                    BOLD_FONT, BUS_NUMBER_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
+                    BOLD_FONT, int(BUS_NUMBER_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
                 number_frame.grid(
                     row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan=2, rowspan=2, padx=15 * SCALE, pady=15*SCALE, sticky="NEWS")
                 self.number_frames.append(number_frame)
 
                 terminus_frame = tk.Label(self.root, text=f"Terminus{i}", font=(
-                    FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
+                    FONT, int(BUS_LITTLE_FONT_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="sw")
                 terminus_frame.grid(row=self.coords[0] - 1 + self.rowspan - 2*i,
                                     column=self.coords[1]+2, columnspan=self.colspan - 2, sticky="NEWS")
                 self.terminus_frames.append(terminus_frame)
 
                 time_frame = tk.Label(self.root, text=f"Time{i}", font=(
-                    FONT, BUS_LITTLE_FONT_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="nw")
+                    FONT, int(BUS_LITTLE_FONT_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="nw")
                 time_frame.grid(row=self.coords[0] + self.rowspan - 2*i,
                                 column=self.coords[1]+2, columnspan=self.colspan - 2, sticky="NEWS")
                 self.time_frames.append(time_frame)
@@ -285,13 +285,13 @@ class WeatherController:
     def create_widgets(self):
         if self.root != None:
             temp_frame = tk.Label(self.root, text=f"", font=(
-                FONT, TEMP_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
+                FONT, int(TEMP_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="se")
             temp_frame.grid(
                 row=self.coords[0]+1, column=self.coords[1]+1, columnspan=3, sticky="NEWS")
             self.widgets.append(temp_frame)
 
             feels_frame = tk.Label(self.root, text=f"", font=(
-                FONT, FEELS_LIKE_SIZE), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
+                FONT, int(FEELS_LIKE_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR, anchor="ne")
             feels_frame.grid(
                 row=self.coords[0]+2, column=self.coords[1]+2, columnspan=2, sticky="NEWS")
             self.widgets.append(feels_frame)
@@ -304,14 +304,14 @@ class WeatherController:
 
             wind_direction_frame = tk.Label(
                 self.root, text="", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-                font=(FONT, WIND_SIZE), anchor="s")
+                font=(FONT, int(WIND_SIZE*SCALE)), anchor="s")
             wind_direction_frame.grid(
                 row=self.coords[0], column=self.coords[1]+3, columnspan=1, sticky="NEWS")
             self.widgets.append(wind_direction_frame)
 
             wind_speed_frame = tk.Label(
                 self.root, text="", bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_ACCENT_COLOUR,
-                font=(FONT, WIND_SIZE), anchor="se")
+                font=(FONT, int(WIND_SIZE*SCALE)), anchor="se")
             wind_speed_frame.grid(
                 row=self.coords[0], column=self.coords[1], columnspan=3, sticky="NEWS")
             self.widgets.append(wind_speed_frame)
@@ -340,6 +340,7 @@ class TimeController:
         self.colspan = colspan
         self.root = root
         self.current_time = None
+        self.previous_time_as_string = None
         self.time_as_string = None
         self.time_in_seconds = None
         self.widget = None
@@ -353,8 +354,11 @@ class TimeController:
         now = datetime.datetime.now()
         midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
         self.time_in_seconds = (now - midnight).seconds
-        if self.widget != None:
+        if self.widget != None or self.time_as_string != self.previous_time_as_string:
             self.widget.configure(text=self.time_as_string)
+            self.previous_time_as_string = self.time_as_string
+            return True
+        return False
 
     def seconds_to_time(self, seconds):
         hours = seconds // 3600
@@ -367,7 +371,7 @@ class TimeController:
 
     def create_clock_widget(self):
         if self.root != None:
-            self.widget = tk.Label(self.root, font=(BOLD_FONT, CLOCK_FONT_SIZE),
+            self.widget = tk.Label(self.root, font=(BOLD_FONT, int(CLOCK_FONT_SIZE*SCALE)),
                                    bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="w")
             self.widget.grid(row=self.coords[0], column=self.coords[1],
                              rowspan=self.rowspan, columnspan=self.colspan, sticky="NEWS")
@@ -391,7 +395,7 @@ class DateController:
 
     def create_date_frame(self):
         if self.root != None:
-            self.widget = tk.Label(self.root, font=(FONT, DATE_FONT_SIZE),
+            self.widget = tk.Label(self.root, font=(FONT, int(DATE_FONT_SIZE * SCALE)),
                                    bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR, anchor="nw")
             self.widget.grid(row=self.coords[0]+1, column=self.coords[1],
                              rowspan=self.rowspan, columnspan=self.colspan, sticky="NEWS")
@@ -399,6 +403,7 @@ class DateController:
 
 class Program:
     def __init__(self):
+        global SCALE
         locale.setlocale(locale.LC_TIME, LOCALE)
 
         self.root = tk.Tk()
@@ -409,13 +414,15 @@ class Program:
             self.root.columnconfigure(i, weight=1, uniform="col")
             if i < 10:
                 self.root.rowconfigure(i, weight=1, uniform="row")
+        self.root.update()
+        SCALE = min(self.root.winfo_width() / 800, self.root.winfo_height() / 380)
 
-        # self.do_grid()
+        #self.do_grid()
 
         self.timeController = TimeController(
             coords=(0, 0), root=self.root, rowspan=2, colspan=6)
         self.dateController = DateController(
-            coords=(1, 0), root=self.root, rowspan=1, colspan=9)
+            coords=(1, 0), root=self.root, rowspan=1, colspan=11)
         exit_button = tk.Button(self.root, command=self.root.destroy, bg=DEFAULT_BACKGROUND_COLOUR, relief="flat")
         exit_button.grid(row=0, column=6, sticky="NEWS")
         self.busController_1 = BusController(
@@ -439,6 +446,7 @@ class Program:
             self.busController_2.update(self.timeController, False)
             self.weatherController.update(self.timeController)
             self.root.update()
+            
 
 
 if __name__ == '__main__':
