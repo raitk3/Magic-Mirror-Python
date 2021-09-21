@@ -16,6 +16,8 @@ LOCALE = "et_EE.utf8"
 # FONT
 FONT = 'Poppins'
 BOLD_FONT = 'Poppins Semibold'
+BLACK_FONT = 'Poppins Black'
+
 # CLOCK
 SCALE = 1
 CLOCK_FONT_SIZE = 72
@@ -167,7 +169,7 @@ class BusController:
                 row=self.coords[0], column=self.coords[1], columnspan=self.colspan, sticky="NESW")
             for i in range(3):
                 number_frame = tk.Label(self.root, text=f"Bus{i}", font=(
-                    BOLD_FONT, int(BUS_NUMBER_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
+                    BLACK_FONT, int(BUS_NUMBER_SIZE*SCALE)), bg=DEFAULT_BACKGROUND_COLOUR, fg=DEFAULT_FONT_COLOUR)
                 number_frame.grid(
                     row=self.coords[0] + self.rowspan - 1 - 2*i, column=self.coords[1], columnspan=2, rowspan=2, padx=15 * SCALE, pady=15*SCALE, sticky="NEWS")
                 self.number_frames.append(number_frame)
