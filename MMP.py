@@ -212,7 +212,7 @@ class BusController:
             self.last_updated = timeController.current_time
         except Exception as e:
             print(e)
-            print("Failed to update!")
+            print("Failed to update bus schedule!")
         if self.root != None:
             self.title_frame.configure(text=self.stop_name)
             for i in range(3):
